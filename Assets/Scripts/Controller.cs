@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class Controller : SingletonMonoBehaviour<Controller> {
@@ -7,8 +8,10 @@ public class Controller : SingletonMonoBehaviour<Controller> {
     [SerializeField] PolygonCollider2D lineCollider;
     [SerializeField] float radius = 2;
     [SerializeField] GameObject marblePrefab;
-
+    public AudioLowPassFilter filter;
+    public AudioReverbFilter reverb;
     List<GameObject> marbles = new();
+
 
     int sides;
     float rotateSpeed;
@@ -30,16 +33,118 @@ public class Controller : SingletonMonoBehaviour<Controller> {
             MarblesCountChanged.Invoke(marbles.Count);
         }
     }
+
+    public System.Action<bool> CollisionsChanged;
+    bool collisions;
+    public bool Collisions {
+        get { return collisions; }
+        set {
+            collisions = value;
+            CollisionsChanged?.Invoke(collisions);
+        }
+    }
+    public System.Action<bool> ImpactForceChanged;
+    bool impactForce;
+    public bool ImpactForce {
+        get { return impactForce; }
+        set {
+            impactForce = value;
+            ImpactForceChanged?.Invoke(impactForce);
+        }
+    }
+
+    public System.Action<bool> TrailsChanged;
+    bool trails;
+    public bool Trails {
+        get { return trails; }
+        set {
+            trails = value;
+            reverb.enabled = value;
+            TrailsChanged?.Invoke(trails);
+        }
+    }
+
+    //octave zero by default
+    [SerializeField]bool[] octaves = { false, true, false };
+    public System.Action<bool[]> OctavesChanged;
+    public bool[] Octaves {
+        get {
+            return octaves; }
+        set {
+            octaves = value;
+        }
+    }
+
+    public System.Action Beat;
+    [SerializeField] int bpm = 120;
+    [SerializeField] int noteDivision = 16;
+
+    public System.Action<int> NoteDivisionChanged;
+    public int NoteDivision {
+        get { return noteDivision; }
+        set {
+            noteDivision = value;
+            secPerBeat = 60f / (BPM * noteDivision);
+            NoteDivisionChanged?.Invoke(noteDivision);
+        }
+    }
+
+    public int BPM {
+        get { return bpm; }
+        set {
+            bpm = value;
+            secPerBeat = 60f / (value * noteDivision);
+        }
+    }
+
+    bool synchronize;
+    public bool Synchronize {
+        get { return synchronize; }
+        set {
+            synchronize = value;
+        }
+    }
+
+    float beatTime;
+    [SerializeField] float secPerBeat;
     Vector3[] vertices;
 
     void Start()
     {
         Time.timeScale = .8f;
         activeScale = 0;
+        reverb.enabled = false;
+        secPerBeat = 60f / (BPM * noteDivision);
+        ZenMode(false);
+#if UNITY_EDITOR
+        Cursor.SetCursor(PlayerSettings.defaultCursor, new(16,16), CursorMode.ForceSoftware);
+#endif
     }
 
     private void Update() {
         lineRenderer.transform.Rotate(new Vector3(0, 0, RotateSpeed) * Time.deltaTime);
+        if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
+
+        beatTime += Time.deltaTime;
+
+        if(beatTime >= secPerBeat) {
+            if(synchronize) Beat.Invoke();
+            beatTime = 0;
+        }
+
+    }
+
+    public void ZenMode(bool on) {
+        if (on) {
+            Camera.main.orthographicSize = 1.7f;
+        } else {
+            Camera.main.orthographicSize = 3f;
+        }
+    }
+
+    public void ChangeOctave() {
+        //stupid
+        OctavesChanged?.Invoke(octaves);
     }
 
     public void SpawnMarble() {
@@ -48,6 +153,10 @@ public class Controller : SingletonMonoBehaviour<Controller> {
             marbles.Add(m);
             Marbles = marbles.Count;
         }
+    }
+
+    public void FilterChanged(float value) {
+        filter.cutoffFrequency = value;
     }
 
     public void SidesChanged(int value) {
