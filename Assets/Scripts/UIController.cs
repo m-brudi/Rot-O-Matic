@@ -169,9 +169,6 @@ public class UIController : MonoBehaviour
             }
         });
 
-        //start with 1/8 note
-
-
         syncBtn.onClick.AddListener(() =>{
             Controller.Instance.Synchronize = !Controller.Instance.Synchronize;
             ChangeRhythmSection(Controller.Instance.Synchronize);
