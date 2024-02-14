@@ -11,7 +11,7 @@ public class Controller : SingletonMonoBehaviour<Controller> {
     public AudioLowPassFilter filter;
     public AudioReverbFilter reverb;
     List<GameObject> marbles = new();
-
+    public bool moreThanOneOctave;
 
     int sides;
     float rotateSpeed;
@@ -143,7 +143,12 @@ public class Controller : SingletonMonoBehaviour<Controller> {
     }
 
     public void ChangeOctave() {
-        //stupid
+        int i = 0;
+        foreach (var item in octaves) {
+            if (item) i++;
+        }
+        moreThanOneOctave = i > 1;
+
         OctavesChanged?.Invoke(octaves);
     }
 

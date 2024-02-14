@@ -41,6 +41,7 @@ public class Oscillator : SingletonMonoBehaviour<Oscillator> {
     bool play;
     float timer;
     float volume;
+    bool moreThanOneOctave;
 
     [SerializeField] bool octaveDown;
     [SerializeField] bool octaveZero;
@@ -68,7 +69,9 @@ public class Oscillator : SingletonMonoBehaviour<Oscillator> {
         octaveDown = octaves[0];
         octaveZero = octaves[1];
         octaveUp = octaves[2];
+        moreThanOneOctave = Controller.Instance.moreThanOneOctave;
     }
+
 
     public void Play(float force) {
         int scaleInd = Controller.Instance.ActiveScale;
@@ -91,12 +94,19 @@ public class Oscillator : SingletonMonoBehaviour<Oscillator> {
         else return value;
     }
     float OctaveDownCheck(float value) {
-        if (octaveDown) return Random.value > .5f ? value : .5f;
-        else return value;
+        if (octaveDown) {
+            if (moreThanOneOctave)
+                return Random.value > .5f ? value : .5f;
+            else
+                return .5f;
+        } else return value;
     }
     float OctaveUpCheck(float value) {
-        if (octaveUp) return Random.value > .5f ? value : 2;
-        else return value;
+        if (octaveUp) {
+            if (moreThanOneOctave)
+                return Random.value > .5f ? value : 2;
+            else return 2;
+        } else return value;
     }
 
 
