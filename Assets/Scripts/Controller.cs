@@ -12,6 +12,7 @@ public class Controller : SingletonMonoBehaviour<Controller> {
     public AudioReverbFilter reverb;
     List<GameObject> marbles = new();
 
+    public bool moreThanOneOctave;
 
     int sides;
     float rotateSpeed;
@@ -117,7 +118,7 @@ public class Controller : SingletonMonoBehaviour<Controller> {
         secPerBeat = 60f / (BPM * noteDivision);
         ZenMode(false);
 #if UNITY_EDITOR
-        Cursor.SetCursor(PlayerSettings.defaultCursor, new(16,16), CursorMode.ForceSoftware);
+        //Cursor.SetCursor(PlayerSettings.defaultCursor, new(16,16), CursorMode.ForceSoftware);
 #endif
     }
 
@@ -143,7 +144,12 @@ public class Controller : SingletonMonoBehaviour<Controller> {
     }
 
     public void ChangeOctave() {
-        //stupid
+        int i = 0;
+        foreach (var item in octaves) {
+            if (item) i++;
+        }
+        moreThanOneOctave = i > 1;
+
         OctavesChanged?.Invoke(octaves);
     }
 

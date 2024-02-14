@@ -45,7 +45,7 @@ public class Oscillator : SingletonMonoBehaviour<Oscillator> {
     [SerializeField] bool octaveDown;
     [SerializeField] bool octaveZero;
     [SerializeField] bool octaveUp;
-
+    [SerializeField] bool moreThanOneOctave;
     private void Awake() {
         sampleRate = AudioSettings.outputSampleRate;
     }
@@ -68,6 +68,7 @@ public class Oscillator : SingletonMonoBehaviour<Oscillator> {
         octaveDown = octaves[0];
         octaveZero = octaves[1];
         octaveUp = octaves[2];
+        moreThanOneOctave = Controller.Instance.moreThanOneOctave;
     }
 
     public void Play(float force) {
@@ -87,16 +88,24 @@ public class Oscillator : SingletonMonoBehaviour<Oscillator> {
     }
 
     float OctaveZeroCheck(float value) {
-        if (octaveZero) return Random.value > .5f ? value : 1;
-        else return value;
+        if (octaveZero) {
+           return Random.value > .5f ? value : 1;
+        } else return value;
     }
     float OctaveDownCheck(float value) {
-        if (octaveDown) return Random.value > .5f ? value : .5f;
-        else return value;
+        if (octaveDown) {
+            if (moreThanOneOctave)
+                return Random.value > .5f ? value : .5f;
+            else 
+                return .5f;
+        } else return value;
     }
     float OctaveUpCheck(float value) {
-        if (octaveUp) return Random.value > .5f ? value : 2;
-        else return value;
+        if (octaveUp) {
+            if (moreThanOneOctave)
+                return Random.value > .5f ? value : 2;
+            else return 2;
+        } else return value;
     }
 
 
