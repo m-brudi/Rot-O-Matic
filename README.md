@@ -5,7 +5,7 @@
 Sound generation done using OnAudiofilterRead method.</br>
 5 different scales, low pass filter, sync to tempo, reverb, Zen Mode
 
-check on [itch.io](https://m-brudi.itch.io/rot-o-matic)
+[itch.io](https://m-brudi.itch.io/rot-o-matic)
 
 
 
