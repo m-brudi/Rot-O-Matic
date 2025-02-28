@@ -1,6 +1,6 @@
 # Rot-O-Matic
 
-## Random melody generator/sequencer, that is not only fun to look at but also sounds half devent (sometimes) </br>
+## Random melody generator/sequencer, that is not only fun to look at but also sounds half decent (sometimes) </br>
 
 Sound generation done using OnAudiofilterRead method.</br>
 5 different scales, low pass filter, sync to tempo, reverb, Zen Mode
